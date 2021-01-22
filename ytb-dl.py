@@ -6,12 +6,12 @@ from json import dump, load
 from os import listdir, system
 from platform import system as arc
 from mutagen.easyid3 import EasyID3
-from notify2 import init, Notification, URGENCY_NORMAL
+from mutagen.id3 import APIC
+from mutagen.mp3 import MP3 as open_MP3
+from eyed3 import load
 from shutil import move 
+from wget import download
 
-
-def notify(phrase):
-    system(f"notify-send '{phrase}' -i /home/lucas/.config/icons/youtube.png -a Youtube-Downloader")
 
 def find_directories():
     from winreg import HKEY_CURRENT_USER, OpenKey, KEY_READ, QueryValueEx
@@ -82,11 +82,6 @@ class Youtube():
         self.artist = artist
         self.date = date
         self.album = album
-
-    def __str__(self):
-        return f"Title: {self.title}\nArtist: {self.artist}"
-
-    def download_audio(self):
         options = {
     'format': 'bestaudio/best',
     'postprocessors': [{
@@ -94,21 +89,33 @@ class Youtube():
         'preferredcodec': 'mp3',
         'preferredquality': '192',
     }]}
-        youtube = YoutubeDL(options)
-        youtube.download([self.url])
+        self.youtube = YoutubeDL(options)
+
+    def __str__(self):
+        return f"Title: {self.title}\nArtist: {self.artist}"
+
+    def download_audio(self):
+        self.youtube.download([self.url])
   		
+    def download_thumb(self):
+        thumbnails = self.youtube.extract_info(self.url,download = False)
+        thumbnails = thumbnails["thumbnails"]
+        count = 0
+        for thumb in thumbnails:
+            if count == 0:
+                download(thumb["url"], out = "thumbnail.jpg")
+            count += 1
 
 class MP3():
     
     def __init__(self):
-        self.name = [f for f in listdir() if f.split(".")[-1] == "mp3"][0]
-        self.audio = EasyID3(self.name)
-    
+        self.name = [f for f in listdir() if f.endswith("mp3")][0]
+          
     def add_tags(self, info):
+        self.audio = EasyID3(self.name)
         self.audio["title"] = info.title
         self.audio["artist"] = info.artist
         self.audio["album"] = info.album
-        self.audio.save()
     
     def move(self):
         if arc().lower() == "windows":
@@ -116,6 +123,14 @@ class MP3():
             move(f"{self.name}", r"{}/{}".format(directories["music"], self.name))
         else:
             move(f"{self.name}", r"/media/NTFS/Music/{}".format(self.name))
+
+    def add_cover(self):
+        self.audio = open_MP3(self.name)
+        self.thumb = open("thumbnail.jpg", "rb")
+        self.audio.tags.add(APIC(mime='image/jpeg',type=3,desc=u'Cover',data=self.thumb.read()))
+
+    def save(self):
+        self.audio.save()
 
 
 
@@ -140,7 +155,8 @@ txt = Txt()
 
 
 if args.add_artist:
-    txt.add(args.add_artist.lower())
+    for artist in args.add_artist.split():
+        txt.add(artist.lower())
 
 #Le json e retorna os artistas
 try:
@@ -173,10 +189,14 @@ if args.url:
         title = new_title
     elif args.title:
         title = args.title
-
-    Youtube = Youtube(url = args.url, title = title, artist = uploader, date = date, album = args.album)
+    if args.album:
+        Youtube = Youtube(url = args.url, title = title, artist = uploader, date = date, album = args.album)
+    elif not args.album:
+        Youtube = Youtube(url = args.url, title = title, artist = uploader, date = date, album = "")
     Youtube.download_audio()
+    Youtube.download_thumb()
     mp3 = MP3()
     mp3.add_tags(Youtube)
+    mp3.add_cover()
+    mp3.save()
     mp3.move()
-    notify(f"{title} : {uploader} has been downloaded!")
