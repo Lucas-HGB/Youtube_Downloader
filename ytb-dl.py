@@ -8,7 +8,6 @@ from platform import system as arc
 from mutagen.easyid3 import EasyID3
 from mutagen.id3 import APIC
 from mutagen.mp3 import MP3 as open_MP3
-from eyed3 import load
 from shutil import move 
 from wget import download
 
@@ -116,6 +115,7 @@ class MP3():
         self.audio["title"] = info.title
         self.audio["artist"] = info.artist
         self.audio["album"] = info.album
+        self.audio.save()
     
     def move(self):
         if arc().lower() == "windows":
@@ -128,8 +128,7 @@ class MP3():
         self.audio = open_MP3(self.name)
         self.thumb = open("thumbnail.jpg", "rb")
         self.audio.tags.add(APIC(mime='image/jpeg',type=3,desc=u'Cover',data=self.thumb.read()))
-
-    def save(self):
+        print("Changed art cover")
         self.audio.save()
 
 
@@ -198,5 +197,4 @@ if args.url:
     mp3 = MP3()
     mp3.add_tags(Youtube)
     mp3.add_cover()
-    mp3.save()
     mp3.move()
