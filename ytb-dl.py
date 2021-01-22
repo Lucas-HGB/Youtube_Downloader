@@ -3,12 +3,12 @@
 from argparse import ArgumentParser
 from youtube_dl import YoutubeDL
 from json import dump, load
-from os import listdir, system
+from os import listdir, system, remove
 from platform import system as arc
 from mutagen.easyid3 import EasyID3
 from mutagen.id3 import APIC
 from mutagen.mp3 import MP3 as open_MP3
-from shutil import move 
+from shutil import move
 from wget import download
 
 
@@ -130,6 +130,7 @@ class MP3():
         self.audio.tags.add(APIC(mime='image/jpeg',type=3,desc=u'Cover',data=self.thumb.read()))
         print("Changed art cover")
         self.audio.save()
+        self.thumb.close()
 
 
 
@@ -198,3 +199,4 @@ if args.url:
     mp3.add_tags(Youtube)
     mp3.add_cover()
     mp3.move()
+    remove("thumbnail.jpg")
