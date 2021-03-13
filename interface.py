@@ -1,18 +1,8 @@
 import tkinter as tk
-from ytb_dl import Youtube, MP3
+from ytb_dl import Youtube, MP3, YoutubeDL
 from os import remove
 from youtube_dl import YoutubeDL
-
-
-def download(self, url, title, artist, album):
-    Youtube = Youtube(url = url, title = title, artist = artist, album = album)
-    mp3 = MP3()
-    Youtube.download_audio()
-    Youtube.download_thumb()
-    mp3.add_tags(Youtube)
-    mp3.add_cover()
-    mp3.move()
-    remove("thumbnail.jpg")
+from threading import Thread
 
 root= tk.Tk()
 root.title("Youtube Downloader")
@@ -49,28 +39,40 @@ def start_download_mp3():
     artist = artist_input.get()
     album = album_input.get()
     title = title_input.get()
+    label1 = tk.Label(root, text= "Downloading")
+    canvas1.create_window(100, 150, window=label1)
     ytb = Youtube(url = url, title = title, artist = artist, album= album)
     ytb.download_audio()
-    label1 = tk.Label(root, text= "Downloading")
-    canvas1.create_window(200, 150, window=label1)
     ytb.download_thumb()
-    mp3 = MP3()
+    title = YoutubeDL({}).extract_info(url = url, download=False)["title"]
+    mp3 = MP3(title)
     mp3.add_tags(ytb)
     mp3.add_cover()
     remove("thumbnail.jpg")
     label1 = tk.Label(root, text= "Done")
-    canvas1.create_window(200, 150, window=label1)
+    canvas1.create_window(30, 150, window=label1)
 
 def download_mp4():
     url = url_input.get()
     youtube = YoutubeDL()
+    label1 = tk.Label(root, text= "Downloading")
+    canvas1.create_window(100, 150, window=label1)
     youtube.download([url])
+    label1 = tk.Label(root, text= "Done")
+    canvas1.create_window(30, 150, window=label1)
 
 
 ## BUTTONS
-button1 = tk.Button(text='Download MP3', command=start_download_mp3)
+def run_mp3():
+    Thread(target = start_download_mp3).start()
+
+def run_mp4():
+    Thread(target = download_mp4).start()
+
+
+button1 = tk.Button(text='Download MP3', command=run_mp3)
 canvas1.create_window(200, 150, window=button1)
-button1 = tk.Button(text='Download MP4', command=download_mp4)
+button1 = tk.Button(text='Download MP4', command=run_mp4)
 canvas1.create_window(200, 180, window=button1)
 
 root.mainloop()
