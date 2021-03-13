@@ -107,8 +107,8 @@ class Youtube():
 
 class MP3():
     
-    def __init__(self):
-        self.name = [f for f in listdir() if f.endswith("mp3")][0]
+    def __init__(self, file):
+        self.name = [f for f in listdir() if f[0:3] == file[0:3]][0]
           
     def add_tags(self, info):
         self.audio = EasyID3(self.name)
