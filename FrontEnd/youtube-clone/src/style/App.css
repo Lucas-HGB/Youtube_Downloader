@@ -1,0 +1,9 @@
+.app {
+    background-color: #181818;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.app_page {
+    display: flex;
+}
