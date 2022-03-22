@@ -1,0 +1,16 @@
+/Errors/**
+Erros
+/Logs/**
+**/__pycache__
+.configs.json
+flutter/
+Run.ps1
+.configs.json
+Drivers/Appium.Linux.AppImage
+*.log
+*.ser
+*.xlsx
+*.html
+.map.html
+TelemetryProcessing.xlsx
+.env
