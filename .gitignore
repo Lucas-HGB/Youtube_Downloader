@@ -14,3 +14,12 @@ Drivers/Appium.Linux.AppImage
 .map.html
 TelemetryProcessing.xlsx
 .env
+API/Data
+API/Logs
+API/Lib
+API/Scripts
+API/
+**/node_modules
+**/*.json
+FrontEnd/youtube-clone/public
+FrontEnd/youtube-react/
