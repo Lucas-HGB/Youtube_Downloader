@@ -1,0 +1,15 @@
+version: '3'
+
+services: 
+    api:
+        image: youtube_downloader:api
+        volumes:
+            - ./ytb_dl.conf:/etc/youtube_downloader/ytb_dl.conf
+            - ./Data:/var/lib/youtube_downloader
+            - ./Logs:/var/log/youtube_downloader
+        ports:
+            - "8000:8000"
+    front_end:
+        image: youtube_downloader:front
+        ports:
+            - "8100:80"
