@@ -3,15 +3,21 @@ version: '3'
 services: 
     api:
         image: youtube_downloader:api
+        build:
+            context: "./API/"
         volumes:
-            - ./Conf/ytb_dl.conf:/etc/youtube_downloader/ytb_dl.conf
-            - ./Data:/var/lib/youtube_downloader
+            - ./Config/ytb_dl.conf:/etc/youtube_downloader/ytb_dl.conf
+            - ./Media:/var/lib/youtube_downloader
             - ./Logs:/var/log/youtube_downloader
+            - ./API/App/:/usr/src/youtube_downloader/
         ports:
             - "8000:8000"
     front_end:
         image: youtube_downloader:front_end
+        build:
+            context: "./FrontEnd/"
         volumes:
-            - ./Data:/var/lib/youtube_downloader
+            - ./Media:/var/lib/youtube_downloader
+            - ./FrontEnd:/home/node/app
         ports:
             - "8100:3000"
