@@ -8,7 +8,7 @@ from yt_dlp import YoutubeDL
 from .Configs import Configs
 from .DataClasses import YoutubeMetadata, YoutubeDLOptions
 from .MetadataHandler import MetadataHandler
-from .Utils import write_to_json, remove_invalid_char
+from .Utils import write_to_json, remove_invalid_char, Thread
 from .Filter import Filter
 
 
@@ -42,7 +42,13 @@ class YoutubeHandler:
             mp3.add_cover(self.metadata.thumbnail_b64)
 
     def download_video(self):
-        file_format = remove_invalid_char('{} - {}'.format(self.metadata['title'], self.metadata['channel'])) + '.mp4'
+        file_format = (
+            remove_invalid_char(
+                f"{self.metadata['title']} - {self.metadata['channel']}"
+            )
+            + '.mp4'
+        )
+
         if self.url not in self.cached_videos:
             logging.info(f'Downloading mp4 from {self.url}')
             self.cached_videos.append(self.url)
@@ -77,9 +83,9 @@ class YoutubeHandler:
         return self._url
 
     @url.setter
-    def url(self, url):
-        logging.info(f'Setting current url to {url}')
+    def url(self, video_id: str):
+        url = f'https://www.youtube.com/watch?v={video_id}'
+        logging.info(f'Setting current url to {url!r}')
         self._url = url
         metadata = self.update_video_metadata()
-        self.download_video()
-        return metadata
+        Thread(target=self.download_video).start()

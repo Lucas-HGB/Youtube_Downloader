@@ -1,6 +1,7 @@
 import json
 import unicodedata
 import re
+import concurrent
 from platform import system as platform
 
 
@@ -36,3 +37,27 @@ def remove_invalid_char(value, allow_unicode=False):
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value.lower())
     return re.sub(r'[-\s]+', '-', value).strip('-_')
+
+
+class Thread:
+
+    all_threads = {}
+    ThreadPoolExecutor = concurrent.futures.ThreadPoolExecutor()
+
+    def __init__(self, target, *args, **kwargs):
+        self.target = target
+        self.args = args
+        self.kwargs = kwargs
+
+    def start(self) -> concurrent.futures.Future:
+        try:
+            new = Thread.ThreadPoolExecutor.submit(
+                lambda: self.target(*self.args, **self.kwargs)
+                )
+        except:
+            pass
+        Thread.all_threads[new] = self.target
+        return new
+
+    def get_running_threads():
+        return [th for th in Thread.all_threads if not th.done()]
