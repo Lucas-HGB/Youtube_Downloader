@@ -1,16 +1,16 @@
 import VideoDescription from "../components/VideoDescription";
 import VideoPlayer from "../components/VideoPlayer";
 import "../style/VideoPage.css";
+import { update_video } from "../functions/API";
 import { useParams } from 'react-router';
 
-const VideoPage = ({ ytbUrl }) => {
-  // let videoID = JSON.stringify(useParams());
-  // console.log(videoID);
+
+function VideoPage () {
+  let {searchUrl} = useParams();
+  update_video(searchUrl);
   return (
     <div className="video_page">
-        {/* <code>{JSON.stringify(match, null, 2)}</code>
-        <code>{JSON.stringify(location, null, 2)}</code> */}
-        <VideoPlayer/>
+        <VideoPlayer searchUrl={searchUrl}/>
         <VideoDescription/>
     </div>
   )
