@@ -10,12 +10,5 @@ export function update_video(searchUrl) {
 
 export const get_metadata = async () => {
     const response = await axios.get(`${API_URL}/visualize/metadata`);
-    console.log(response);  
-    return JSON.parse(response.responseText);
+    return response.data;
 }
-
-
-
-
-
-

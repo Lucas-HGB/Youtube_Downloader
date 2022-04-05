@@ -1,16 +1,9 @@
 .video_player-container {
-    padding-top: 56.25%;
-    position: relative;
     border: 1px solid white;
+    flex: .8;
 }
   
 iframe {
     width: 100%;
     height: 100%;
-    border: 0;
-    left: 0;
-    top: 0;
-    position: absolute;
 }
-  
-  

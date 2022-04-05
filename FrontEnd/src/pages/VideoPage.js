@@ -10,8 +10,8 @@ function VideoPage () {
   update_video(searchUrl);
   return (
     <div className="video_page">
-        <VideoPlayer searchUrl={searchUrl}/>
-        <VideoDescription/>
+        <VideoPlayer searchUrl={searchUrl} id="videoPlayer"/>
+        <VideoDescription id="videoDescription"/>
     </div>
   )
 }
