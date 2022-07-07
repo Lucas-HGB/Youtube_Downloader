@@ -1,7 +1,7 @@
 import tkinter as tk
 from ytb_dl import Youtube, MP3, YoutubeDL
 from os import remove
-from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 from threading import Thread
 
 root= tk.Tk()

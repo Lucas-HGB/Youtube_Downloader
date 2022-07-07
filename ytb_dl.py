@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 from argparse import ArgumentParser
-from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 from json import dump, load
 from os import listdir, remove
 from platform import system as arc
@@ -12,7 +12,6 @@ from shutil import move
 from wget import download
 from ctypes.wintypes import  MAX_PATH
 from ctypes import create_unicode_buffer
-from ctypes import windll
 
 class Youtube():
 
@@ -58,16 +57,16 @@ class MP3():
         self.audio["album"] = info.album
         self.audio.save()
 
-    def move(self):
-        if arc().lower() == "windows":
-            SHGFP_TYPE_CURRENT = 0
-            CSIDL_PERSONAL = 13
-            buf= create_unicode_buffer(MAX_PATH)
-            windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
-            musicsDir = buf.value
-            move(f"{self.name}", r"{}/{}".format(musicsDir, self.name))
-        else:
-            move(f"{self.name}", r"/media/NTFS/Music/{}".format(self.name))
+    # def move(self):
+    #     if arc().lower() == "windows":
+    #         SHGFP_TYPE_CURRENT = 0
+    #         CSIDL_PERSONAL = 13
+    #         buf= create_unicode_buffer(MAX_PATH)
+    #         windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
+    #         musicsDir = buf.value
+    #         move(f"{self.name}", r"{}/{}".format(musicsDir, self.name))
+    #     else:
+    #         move(f"{self.name}", r"/media/NTFS/Music/{}".format(self.name))
 
     def add_cover(self):
         self.audio = open_MP3(self.name)
