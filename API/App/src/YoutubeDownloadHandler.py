@@ -42,6 +42,7 @@ class YoutubeHandler:
         with MetadataHandler(output_path) as mp3:
             mp3['title'] = Filter.filter_title(self.metadata.title)
             mp3['artist'] = Filter.filter_artist(self.metadata.channel)
+            mp3['album'] = self.metadata.album if hasattr(self.metadata, 'album') else None
             mp3['website'] = self.url
             mp3['language'] = self.metadata.other.get('language')
             mp3.add_cover(self.metadata.thumbnail_b64)
