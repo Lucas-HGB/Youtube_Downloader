@@ -3,7 +3,7 @@ import unicodedata
 import re
 import logging
 import concurrent
-from subprocess import Popen, CREATE_NO_WINDOW, PIPE, run
+from subprocess import Popen, PIPE, run
 from platform import system as platform
 
 

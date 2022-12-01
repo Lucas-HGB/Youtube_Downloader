@@ -50,6 +50,12 @@ class YoutubeDLOptions(pydantic.BaseModel):
 		return self.current_setup == 'mp4'
 
 
+class InterfaceMetadata(pydantic.BaseModel):
+
+	title: str
+	channel: str
+	album: str
+
 class YoutubeMetadata(pydantic.BaseModel):
 	
 	url: str
@@ -57,6 +63,7 @@ class YoutubeMetadata(pydantic.BaseModel):
 	title: str
 	thumbnail_b64: str
 	other: dict
+	album: str = None
 
 	@pydantic.root_validator(pre=True)
 	@classmethod
@@ -81,6 +88,11 @@ class YoutubeMetadata(pydantic.BaseModel):
 		
 	def to_json(self):
 		return dict(self)
+
+	def update(self, **kwargs):
+		for key, value in kwargs.items():
+			setattr(self, key, value)
+		return self
 
 	def __getitem__(self, key):
 		return dict(self)[key]

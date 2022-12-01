@@ -6,7 +6,7 @@ import moviepy.editor as mp
 from yt_dlp import YoutubeDL
 
 from .Configs import Configs
-from .DataClasses import YoutubeMetadata, YoutubeDLOptions
+from .DataClasses import YoutubeMetadata, YoutubeDLOptions, InterfaceMetadata
 from .MetadataHandler import MetadataHandler
 from .Utils import write_to_json, remove_invalid_char, get_logger, Thread
 from .Filter import Filter
@@ -64,8 +64,8 @@ class YoutubeHandler:
 
         return full_path
 
-    def update_video_metadata(self):
-        logger.info(f'update_video_metadata')
+    def extract_metadata(self):
+        logger.info(f'extract_metadata')
         metadata = self.ytb.extract_info(url = self.url, download=False)
         self.metadata = YoutubeMetadata(raw_metadata=metadata)
         self.log_metadata()
@@ -92,5 +92,8 @@ class YoutubeHandler:
         url = f'https://www.youtube.com/watch?v={video_id}'
         logger.info(f'Setting current url to {url}')
         self._url = url
-        metadata = self.update_video_metadata()
+        metadata = self.extract_metadata()
         Thread(target=self.download_video).start()
+
+    def update_video_metadata(self, metadata: InterfaceMetadata):
+        return self.metadata.update(**metadata.dict())
