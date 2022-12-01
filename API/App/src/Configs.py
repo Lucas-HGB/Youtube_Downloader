@@ -56,7 +56,8 @@ class Configs:
 		self.title_regex = {}
 		self.transform_upper = True
 		self.set_cache_dir()
-		self.set_output_path()
+		self.set_mp3_output_path()
+		self.set_mp4_output_path()
 
 	def load_config(self):
 		logger.info(f'Loading config')
