@@ -10,7 +10,11 @@ from threading import Thread
 from src.YoutubeDownloadHandler import YoutubeHandler
 
 logging.basicConfig(level=os.environ.get('LOGGING_LEVEL', 'INFO'))
-
+logging.getLogger('Configs').setLevel(logging.ERROR)
+logging.getLogger('DataClasses').setLevel(logging.ERROR)
+logging.getLogger('Filter').setLevel(logging.ERROR)
+logging.getLogger('MetadataHandler').setLevel(logging.INFO)
+logging.getLogger('YoutubeDownloadHandler').setLevel(logging.INFO)
 
 ytb = YoutubeHandler()
 
@@ -46,5 +50,3 @@ async def get_video_metadata():
 @app.get('/status/download')
 async def download_status():
     return ytb.download_status
-
-# uvicorn API:app --reload

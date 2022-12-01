@@ -1,7 +1,8 @@
 import os, json, re
-from .Utils import read_from_json, write_to_json
+from .Utils import read_from_json, write_to_json, is_unix, get_app_path, get_logger
 from .DataClasses import YoutubeDLOptions
 
+logger = get_logger(__file__)
 
 
 class Configs:
@@ -23,17 +24,27 @@ class Configs:
 
 	def __init__(self):
 		self.set_cache_dir()
-		self.config_dir = os.path.join('/', 'etc', 'youtube_downloader')
-		self.mp3_output_path = self.mp4_output_path = os.path.join('/', 'var', 'lib', 'youtube_downloader')
-		if os.path.isfile(os.path.join(self.config_dir, "ytb_dl.conf")):
+		self.config_dir = os.path.join('/', 'etc', 'youtube_downloader') if is_unix() else get_app_path()
+		self.mp3_output_path = self.mp4_output_path = os.path.join('/', 'var', 'lib', 'youtube_downloader') if is_unix() else os.path.join(get_app_path(), 'Downloads')
+		if not os.path.exists(self.mp3_output_path):
+			logger.info(f'Output path not created, creating')
+			os.mkdir(self.mp3_output_path)
+
+		if os.path.isfile(conf := os.path.join(self.config_dir, "ytb_dl.conf")):
+			logger.info(f'Config {conf!r} found')
 			self.load_config()
 		else:
+			logger.info(f'Config {conf!r} not found')
 			self.set_default_config()
 		self.youtubeDL_options = YoutubeDLOptions()
 		self.youtubeDL_options.prepare_mp3_download()
 
 	def set_cache_dir(self):
-		self.cache_dir = os.path.join('/', 'var', 'log', 'youtube_downloader')
+		self.cache_dir = os.path.join('/', 'var', 'log', 'youtube_downloader') if is_unix() else os.path.join(get_app_path(), 'cache')
+		logger.info(f'Cache dir is {self.cache_dir}')
+		if not os.path.exists(self.cache_dir):
+			logger.info(f'Cache dir not created, creating.')
+			os.mkdir(self.cache_dir)
 
 	def set_default_config(self):
 		self.artist_regex = {}

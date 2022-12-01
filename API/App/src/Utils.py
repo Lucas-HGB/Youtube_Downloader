@@ -1,22 +1,30 @@
 import json
 import unicodedata
 import re
+import logging
 import concurrent
+from subprocess import Popen, CREATE_NO_WINDOW, PIPE, run
 from platform import system as platform
 
 
+def get_logger(file: str):
+    return logging.getLogger(file.split('/' if is_unix() else '\\')[-1].strip('.py'))
 
+def get_app_path() -> str:
+    return '\\'.join(__file__.split('\\' if not is_unix() else '/')[0:-4])
+
+def get_command_output(command):
+    output = run(["powershell.exe", "-Command", command], stdout=PIPE).stdout.decode('utf-8')
+    return output.replace("\n", "").replace("\r", "")
 
 
 def read_from_json(file) -> dict:
     with open(file, "r") as opened_file:
         return json.load(opened_file)
-       
-
+        
 def write_to_json(file, data) -> None:
     with open(file, "w", encoding='utf-8') as file_opened:
         json.dump(data, file_opened, indent=4, ensure_ascii=False)
-
 
 def is_unix() -> bool:
     return platform().lower() == "linux"
