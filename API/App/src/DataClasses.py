@@ -4,9 +4,21 @@ import datetime
 import requests
 import base64
 import pprint
-from .Utils import get_logger
+from .Utils import get_logger, get_video_code, format_watch_url
 
 logger = get_logger(__file__)
+
+
+
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
 
 
 class YoutubeDLOptions(pydantic.BaseModel):
@@ -64,18 +76,26 @@ class YoutubeMetadata(pydantic.BaseModel):
 	thumbnail_b64: str
 	other: dict
 	album: str = None
+	doc_id: str = None
 
-	@pydantic.root_validator(pre=True)
+	def get_video_code(self) -> str:
+		return get_video_code(self.url)
+
 	@classmethod
-	def parse_metadata(cls, values):
+	def from_cache(cls, metadata: str):
+		metadata['other'] = {}
+		metadata['thumbnail_b64'] = metadata.pop('thumbnail')
+		metadata['url'] = format_watch_url(metadata.pop('video_code'))
+		return cls(**metadata)
+
+	@classmethod
+	def from_raw_data(cls, metadata: dict):
 		logger.info('parse_metadata')
-		metadata = values['raw_metadata']
 		thumbnail_b64 = base64.b64encode(requests.get(metadata['thumbnail']).content)
 		metadata.pop('formats')
 		metadata.pop('thumbnails')
 		if 'automatic_captions' in metadata:
 			metadata.pop('automatic_captions')
-
 		data = {
 			'url': metadata.pop('original_url'),
 			'channel': metadata.pop('channel'),
@@ -84,7 +104,7 @@ class YoutubeMetadata(pydantic.BaseModel):
 			'other': {key: value for key, value in sorted(metadata.items())}
 		}
 		logger.debug(data)
-		return data
+		return cls(**data)
 		
 	def to_json(self):
 		return dict(self)
@@ -93,6 +113,15 @@ class YoutubeMetadata(pydantic.BaseModel):
 		for key, value in kwargs.items():
 			setattr(self, key, value)
 		return self
+
+	def to_elastic(self) -> dict:
+		return {
+			"video_code": self.get_video_code(),
+			'channel': self.channel,
+			'title': self.title,
+			'thumbnail': self.thumbnail_b64,
+			'album': self.album
+		}
 
 	def __getitem__(self, key):
 		return dict(self)[key]

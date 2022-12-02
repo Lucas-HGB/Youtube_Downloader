@@ -1,26 +1,11 @@
 import os, json, re
 from .Utils import read_from_json, write_to_json, is_unix, get_app_path, get_logger
-from .DataClasses import YoutubeDLOptions
+from .DataClasses import YoutubeDLOptions, Singleton
 
 logger = get_logger(__file__)
 
 
-class Configs:
-
-	_instance = None
-	def __new__(class_, *args, **kwargs):
-		''' 
-		Caso classe já tenha sido instanciada, retorna tal instância ao invés de criar outra 
-		Isso mantém as configurações uniformes entre todo o programa.
-		'''
-		if not isinstance(class_._instance, class_):
-			class_._instance = object.__new__(class_, *args, **kwargs)
-		return class_._instance
-
-	def __setattr__(self, atr, value):
-		if atr == "_instance" and self._instance:
-			raise AttributeError("Manually setting _instance is not allowed!")
-		self.__dict__[atr] = value
+class Configs(metaclass=Singleton):
 
 	def __init__(self):
 		self.config_dir = os.path.join('/', 'etc', 'youtube_downloader') if is_unix() else get_app_path()

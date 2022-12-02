@@ -8,8 +8,9 @@ from yt_dlp import YoutubeDL
 from .Configs import Configs
 from .DataClasses import YoutubeMetadata, YoutubeDLOptions, InterfaceMetadata
 from .MetadataHandler import MetadataHandler
-from .Utils import write_to_json, remove_invalid_char, get_logger, Thread
+from .Utils import write_to_json, remove_invalid_char, get_logger, Thread, get_video_code, format_watch_url
 from .Filter import Filter
+from .database.cache import Cache
 
 
 logger = get_logger(__file__)
@@ -24,6 +25,7 @@ class YoutubeHandler:
         self.download_status = 'Not Downloading'
         self.configs = Configs()
         self.recreate_ytb_dl()
+        self.cache = Cache()
 
     def recreate_ytb_dl(self):
         logger.info(f'recreate_ytb_dl')
@@ -31,7 +33,7 @@ class YoutubeHandler:
 
     def generate_audio(self):
         logger.info(f'generate_audio')
-        if not self.mp4_path:
+        if not self.mp4_path and not self.cache.is_cached(self.metadata.get_video_code()):
             raise AttributeError('No video has been downloaded!')
         
         video_clip = mp.VideoFileClip(self.mp4_path)
@@ -44,45 +46,27 @@ class YoutubeHandler:
             mp3['artist'] = Filter.filter_artist(self.metadata.channel)
             mp3['album'] = self.metadata.album if hasattr(self.metadata, 'album') else None
             mp3['website'] = self.url
-            mp3['language'] = self.metadata.other.get('language')
+            mp3['language'] = self.metadata.other.get('language', '')
             mp3.add_cover(self.metadata.thumbnail_b64)
-
-    def download_video(self):
-        logger.info(f'download_video')
-        file_format = remove_invalid_char('{} - {}'.format(self.metadata['title'], self.metadata['channel'])) + '.mp4'
-        logger.debug(f'file_format: {file_format}')
-        if self.url not in self.cached_videos:
-            logging.info(f'Downloading mp4 from {self.url}')
-            self.cached_videos.append(self.url)
-            self.configs.youtubeDL_options.prepare_mp4_download()
-            self.recreate_ytb_dl()
-            self.ytb.download([self.url])
-            os.rename(self.download_status['filename'].replace('.f251', ''), os.path.join(self.configs.cache_dir, file_format))
-
-        full_path = os.path.join(self.configs.cache_dir, file_format)
-        self.mp4_path = full_path
-        logger.debug(f'mp4_path: {full_path}')
-
-        return full_path
 
     def extract_metadata(self):
         logger.info(f'extract_metadata')
         metadata = self.ytb.extract_info(url = self.url, download=False)
-        self.metadata = YoutubeMetadata(raw_metadata=metadata)
-        self.log_metadata()
-        return self.metadata
+        return YoutubeMetadata.from_raw_data(metadata)
 
-    def log_metadata(self):
-        logger.info(f'log_metadata')
-        write_to_json(os.path.join(self.configs.cache_dir, remove_invalid_char(str(self.metadata)) + '.log'), dict(self.metadata)) # Logging purposes
+    def download_video(self):
+        logger.info('download_video')
+        file_format = remove_invalid_char('{} - {}'.format(self.metadata['title'], self.metadata['channel'])) + '.mp4'
+        self.configs.youtubeDL_options.prepare_mp4_download()
+        self.recreate_ytb_dl()
+        self.ytb.download([self.url])
+        output_path = os.path.join(self.configs.cache_dir, file_format)
+        os.rename(self.download_status['filename'].replace('.f251', ''), output_path)
+        self.mp4_path = output_path
+        self.cache.add_to_cache(self.mp4_path, self.metadata)
 
     def update_status(self, status):
         self.download_status = status
-
-    def clear_cache(self):
-        logger.info(f'clear_cache')
-        for file in [i for i in os.listdir(os.path.join(self.configs.cache_dir)) if not i.endswith('.log')]:
-            os.remove(os.path.join(self.configs.cache_dir, file))
 
     @property
     def url(self):
@@ -90,11 +74,18 @@ class YoutubeHandler:
 
     @url.setter
     def url(self, video_id: str):
-        url = f'https://www.youtube.com/watch?v={video_id}'
+        url = format_watch_url(video_id)
         logger.info(f'Setting current url to {url}')
         self._url = url
-        metadata = self.extract_metadata()
-        Thread(target=self.download_video).start()
+        if self.cache.is_cached(video_id):
+            self.metadata, video_data = self.cache.get_cached_data(video_id)
+            self.mp4_path = video_data['path']
+            return
+        self.metadata = self.extract_metadata()
+        th = Thread(target=self.download_video).start()
+        # th.result() Debugging purposes
 
     def update_video_metadata(self, metadata: InterfaceMetadata):
-        return self.metadata.update(**metadata.dict())
+        self.metadata.update(**metadata.dict())
+        self.cache.add_to_cache(self.mp4_path, self.metadata)
+        return self.metadata

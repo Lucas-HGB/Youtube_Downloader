@@ -17,6 +17,11 @@ def get_command_output(command):
     output = run(["powershell.exe", "-Command", command], stdout=PIPE).stdout.decode('utf-8')
     return output.replace("\n", "").replace("\r", "")
 
+def get_video_code(url: str) -> str:
+    return url.split('/')[-1].split("=")[-1]
+
+def format_watch_url(video_code: str) -> str:
+    return f'https://www.youtube.com/watch?v={video_code}'
 
 def read_from_json(file) -> dict:
     with open(file, "r") as opened_file:
