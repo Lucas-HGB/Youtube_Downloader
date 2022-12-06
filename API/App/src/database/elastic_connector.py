@@ -1,6 +1,7 @@
 import elasticsearch
 import os
 import pprint
+from elasticsearch.helpers import bulk as es_bulk
 from datetime import datetime, timezone
 from ..DataClasses import Singleton
 from ..Utils import get_logger
@@ -88,4 +89,4 @@ class ElasticConnector(elasticsearch.Elasticsearch, metaclass=Singleton):
         return list(self.indices.get(index='*'))
 
     def do_bulk(self, bulk_body: dict) -> dict:
-        return elasticsearch.helpers.bulk(self, bulk_body)
+        return es_bulk(self, bulk_body)
