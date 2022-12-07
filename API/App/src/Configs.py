@@ -13,36 +13,37 @@ class Configs(metaclass=Singleton):
 			self.load_config()
 		else:
 			self.set_default_config()
+
+		self.set_cache_dir()
+		self.set_mp3_output_path()
+		self.set_mp4_output_path()
 		self.youtubeDL_options = YoutubeDLOptions()
 		self.youtubeDL_options.prepare_mp3_download()
 
 	def set_cache_dir(self, path: str = None):
-		self.cache_dir = path or os.path.join('/', 'var', 'log', 'youtube_downloader') if is_unix() else os.path.join(get_app_path(), 'cache')
+		self.cache_dir = path or os.path.join('/', 'app', 'cache')
 		logger.info(f'Cache dir is {self.cache_dir}')
 		if not os.path.exists(self.cache_dir):
 			logger.info(f'Cache dir not created, creating.')
-			os.mkdir(self.cache_dir)
+			os.makedirs(self.cache_dir)
 
 	def set_mp3_output_path(self, path: str = None):
-		self.mp3_output_path = path or os.path.join('/', 'var', 'lib', 'youtube_downloader') if is_unix() else os.path.join(get_app_path(), 'Downloads')
+		self.mp3_output_path = path or os.path.join('/', 'app', 'media', 'mp3')
 		if not os.path.exists(self.mp3_output_path):
 			logger.info(f'Output path not created, creating')
-			os.mkdir(self.mp3_output_path)
+			os.makedirs(self.mp3_output_path)
 
 	def set_mp4_output_path(self, path: str = None):
-		self.mp4_output_path = path or os.path.join('/', 'var', 'lib', 'youtube_downloader') if is_unix() else os.path.join(get_app_path(), 'Downloads')
+		self.mp4_output_path = path or os.path.join('/', 'app', 'media', 'mp4')
 		if not os.path.exists(self.mp4_output_path):
 			logger.info(f'Output path not created, creating')
-			os.mkdir(self.mp4_output_path)
+			os.makedirs(self.mp4_output_path)
 
 	def set_default_config(self):
 		logger.info(f'Setting default config')
 		self.artist_regex = {}
 		self.title_regex = {}
 		self.transform_upper = True
-		self.set_cache_dir()
-		self.set_mp3_output_path()
-		self.set_mp4_output_path()
 
 	def load_config(self):
 		logger.info(f'Loading config')
@@ -50,6 +51,3 @@ class Configs(metaclass=Singleton):
 		self.artist_regex = {re.compile(reg, flags=re.IGNORECASE): replacement for reg, replacement in conf['artist_regex'].items()}
 		self.title_regex = {re.compile(reg, flags=re.IGNORECASE): replacement for reg, replacement in conf['title_regex'].items()}
 		self.transform_upper = conf['transform_upper']
-		self.set_cache_dir(conf.get('cache_dir'))
-		self.set_mp3_output_path(conf.get('mp3_output_path'))
-		self.set_mp4_output_path(conf.get('mp4_output_path'))
