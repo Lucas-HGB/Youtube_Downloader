@@ -1,9 +1,0 @@
-.video_player-container {
-    border: 1px solid white;
-    flex: .8;
-}
-  
-iframe {
-    width: 100%;
-    height: 100%;
-}
