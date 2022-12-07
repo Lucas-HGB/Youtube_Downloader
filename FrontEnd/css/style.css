@@ -29,7 +29,7 @@ body {
     margin-bottom: 1rem;
 }
 
-.form-input-container{
+#send_link{
     display: flex;
 }
 
