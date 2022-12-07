@@ -5,28 +5,26 @@ import logging
 from collections import defaultdict
 from src import create_app, InterfaceMetadata, YoutubeHandler, Cache
 
-from dotenv import load_dotenv
-load_dotenv()
+LOG_LEVEL = os.environ.get('LOGGING_LEVEL', 'DEBUG')
+logging.info(f'Log level is {LOG_LEVEL}')
 
-
-logging.basicConfig(level=os.environ.get('LOGGING_LEVEL', 'DEBUG'))
+logging.basicConfig(level=LOG_LEVEL)
 logging.getLogger('elastic_transport.transport').setLevel(logging.ERROR)
 logging.getLogger('urllib3').setLevel(logging.ERROR)
 
-logging.getLogger('Configs').setLevel(logging.ERROR)
-logging.getLogger('DataClasses').setLevel(logging.ERROR)
-logging.getLogger('Filter').setLevel(logging.ERROR)
-logging.getLogger('MetadataHandler').setLevel(logging.INFO)
-logging.getLogger('YoutubeDownloadHandler').setLevel(logging.INFO)
-logging.getLogger('cache').setLevel(logging.DEBUG)
-logging.getLogger('elastic_connector').setLevel(logging.INFO)
+logging.getLogger('Configs').setLevel(LOG_LEVEL)
+logging.getLogger('DataClasses').setLevel(LOG_LEVEL)
+logging.getLogger('Filter').setLevel(LOG_LEVEL)
+logging.getLogger('MetadataHandler').setLevel(LOG_LEVEL)
+logging.getLogger('YoutubeDownloadHandler').setLevel(LOG_LEVEL)
+logging.getLogger('cache').setLevel(LOG_LEVEL)
+logging.getLogger('elastic_connector').setLevel(LOG_LEVEL)
 
 
 app = create_app()
 
 videos = defaultdict(YoutubeHandler)
 
-# videos['sbc461eSyrk'].url = 'sbc461eSyrk'
 
 @app.post('/update/{video_id}')
 async def update_video(video_id: str):

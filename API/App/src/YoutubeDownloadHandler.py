@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 import logging
 import os
+import shutil
 import moviepy.editor as mp
 from yt_dlp import YoutubeDL
 
@@ -31,23 +32,33 @@ class YoutubeHandler:
         logger.info(f'recreate_ytb_dl')
         self.ytb = YoutubeDL(self.configs.youtubeDL_options.to_ytb_dl_options(update_hook=self.update_status))
 
+    def move_file(self, origin: str, dest: str):
+        logger.info(f'Move file from {origin!r} to {dest!r}')
+        os.system(f"cp --no-preserve=mode {origin!r} {dest!r}")
+        os.remove(origin)
+
     def generate_audio(self):
         logger.info(f'generate_audio')
         if not self.mp4_path and not self.cache.is_cached(self.metadata.get_video_code()):
             raise AttributeError('No video has been downloaded!')
         
         video_clip = mp.VideoFileClip(self.mp4_path)
-        output_path = os.path.join(self.configs.mp3_output_path, remove_invalid_char(self.metadata.title) + '.mp3')
+        file = remove_invalid_char(self.metadata.title) + '.mp3'
+        output_path = os.path.join(self.configs.cache_dir, file)
 
         video_clip.audio.write_audiofile(output_path)
 
         with MetadataHandler(output_path) as mp3:
             mp3['title'] = Filter.filter_title(self.metadata.title)
             mp3['artist'] = Filter.filter_artist(self.metadata.channel)
-            mp3['album'] = self.metadata.album if hasattr(self.metadata, 'album') else None
+            if hasattr(self.metadata, 'album') and self.metadata.album is not None:
+                mp3['album'] = self.metadata.album
             mp3['website'] = self.url
-            mp3['language'] = self.metadata.other.get('language', '')
+            if self.metadata.other.get('language'):
+                mp3['language'] = self.metadata.other.get('language', '')
             mp3.add_cover(self.metadata.thumbnail_b64)
+
+        self.move_file(output_path, os.path.join(self.configs.mp3_output_path, file))
 
     def extract_metadata(self):
         logger.info(f'extract_metadata')
@@ -61,7 +72,8 @@ class YoutubeHandler:
         self.recreate_ytb_dl()
         self.ytb.download([self.url])
         output_path = os.path.join(self.configs.cache_dir, file_format)
-        os.rename(self.download_status['filename'].replace('.f251', ''), output_path)
+        file = self.download_status['filename'].replace('.f251', '')
+        self.move_file(file, output_path)
         self.mp4_path = output_path
         self.cache.add_to_cache(self.mp4_path, self.metadata)
 
@@ -83,7 +95,7 @@ class YoutubeHandler:
             return
         self.metadata = self.extract_metadata()
         th = Thread(target=self.download_video).start()
-        # th.result() Debugging purposes
+        # th.result() # Debugging purposes
 
     def update_video_metadata(self, metadata: InterfaceMetadata):
         self.metadata.update(**metadata.dict())
