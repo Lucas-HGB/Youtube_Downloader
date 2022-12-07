@@ -1,0 +1,96 @@
+*{
+    padding: 0;
+    margin: 0;
+    font-family: "Ubuntu", sans-serif;
+}
+
+body {
+    background: linear-gradient(180deg, #594cee 0%, #8dd0f5 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.hide {
+    display: none;
+}
+
+.container {
+    background-color: #5c54ed;
+    background-origin: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    padding: 2rem;
+    color: #fdfdfd;
+    border-radius: 1rem;
+}
+
+/* Form */
+.form h3 {
+    margin-bottom: 1rem;
+}
+
+#send_link{
+    display: flex;
+}
+
+.form input {
+    padding: 0.8rem;
+    border: none;
+    flex: 1;
+    border-radius: 4px;
+}
+
+.form button{
+    padding: 0.8rem;
+    min-width: 50px;
+    margin-left: 8px;
+    background-color: #ff0800;
+    color:  #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Metadata */
+#title{
+    padding: 0.8rem;
+    border: none;
+    flex: 1;
+    border-radius: 4px;
+}
+
+#album {
+    padding: 0.8rem;
+    border: none;
+    flex: 1;
+    border-radius: 4px;
+}
+
+#channel {
+    padding: 0.8rem;
+    border: none;
+    flex: 1;
+    border-radius: 4px;
+}
+
+#update {
+    padding: 0.8rem;
+    min-width: 50px;
+    margin-left: 8px;
+    background-color: #ff0800;
+    color:  #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#download {
+    padding: 0.8rem;
+    min-width: 50px;
+    margin-left: 8px;
+    background-color: #ff0800;
+    color:  #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
