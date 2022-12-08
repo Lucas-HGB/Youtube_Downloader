@@ -15,8 +15,8 @@ services:
         # networks:
         #     - privatenetwork
         volumes:
-            - "/mnt/Tank/Media/Musics/:/app/media/mp3"
-            - "/mnt/Pegaus/var/YoutubeDownloaderCache:/app/cache/"
+            - /mnt/Tank/Media/Musics/:/app/media/mp3
+            - /mnt/var/YoutubeDownloaderCache/:/app/cache/
 
     front_end:
         image: youtube_downloader:front
