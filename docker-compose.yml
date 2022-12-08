@@ -1,23 +1,38 @@
 version: '3'
 
 services: 
-    api:
+    ytdlpapi:
         image: youtube_downloader:api
         build:
             context: "./API/"
         volumes:
             - ./Media:/app/media/
             - ./Cache:/app/cache/
-        ports:
-            - "10080:8000"
         env_file:
             - "api.env"
-    # front_end:
-    #     image: youtube_downloader:front_end
-    #     build:
-    #         context: "./FrontEnd/"
-    #     volumes:
-    #         - ./Media:/var/lib/youtube_downloader
-    #         - ./FrontEnd:/home/node/app
-    #     ports:
-    #         - "8100:3000"
+        ports:
+            - "10100:8000"
+        networks:
+            - privatenetwork
+        volumes:
+            - /mnt/Tank/Media/Musics/:/app/media/mp3
+            - /mnt/Pegaus/var/Youtube Downloader Cache:/app/cache/
+
+    front_end:
+        image: youtube_downloader:front
+        build:
+            context: "./FrontEnd/"
+        ports:
+            - "10105:80"
+        networks:
+            - privatenetwork
+
+networks:
+    privatenetwork:
+        name: privatenetwork
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 192.168.99.0/24
+                gateway: 192.168.99.1

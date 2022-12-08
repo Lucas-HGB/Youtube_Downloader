@@ -15,14 +15,14 @@ const getMetadata = async(video_id) => {
         split_url = video_id.split("&")
         video_id = split_url[0].slice(32, 43)
     }
-    const youtubeDownloader = `http://127.0.0.1:8000/update/${video_id}`
+    const youtubeDownloader = `http://ytdlpapi/update/${video_id}`
     const res = await fetch(youtubeDownloader, {method: 'POST'})
     const data = await res.json()
     return data
 }
 
 const deleteCache = (url) =>{
-    const youtubeDownloader = `http://127.0.0.1:8000/cache`
+    const youtubeDownloader = `http://ytdlpapi/cache`
     fetch(youtubeDownloader, {method: 'DELETE'})
     window.alert("Cache deletado")
 }
@@ -39,7 +39,7 @@ const updateMetadata = async (video_id) =>{
 		channel: document.getElementById("channel").value
     }
     console.log({metadata})
-    const youtubeDownloader = `http://127.0.0.1:8000/update/${video_id}/metadata`
+    const youtubeDownloader = `http://ytdlpapi/update/${video_id}/metadata`
     const res = await fetch(youtubeDownloader, {method: 'PUT', headers:{'Content-Type': 'application/json'}, body: JSON.stringify(metadata)})
     console.log({res})
     const data = await res.json()
@@ -53,7 +53,7 @@ const downloadMP3 = async (video_id) =>{
         video_id = split_url[0].slice(32, 43)
     }
     console.log('to aqui')
-    const youtubeDownloader = `http://127.0.0.1:8000/downloadMP3/${video_id}`
+    const youtubeDownloader = `http://ytdlpapi/downloadMP3/${video_id}`
     await fetch(youtubeDownloader, {method: 'POST'})
     
 }
