@@ -56,3 +56,8 @@ async def update_metadata(video_id: str, metadata: InterfaceMetadata):
 async def clear_cache():
     Cache().clear()
     videos.clear()
+
+
+@app.get('/version')
+async def clear_cache():
+    return '2.0'
