@@ -8,12 +8,8 @@ services:
         volumes:
             - ./Media:/app/media/
             - ./Cache:/app/cache/
-        # env_file:
-        #     - "api.env"
         ports:
             - "10100:8000"
-        # networks:
-        #     - privatenetwork
         volumes:
             - /mnt/Tank/Media/Musics/:/app/media/mp3
             - /mnt/var/YoutubeDownloaderCache/:/app/cache/
@@ -24,14 +20,3 @@ services:
             context: "./FrontEnd/"
         ports:
             - "10105:80"
-        # networks:
-        #     - privatenetwork
-
-# networks:
-#     privatenetwork:
-#         name: privatenetwork
-#         driver: bridge
-#         ipam:
-#             driver: default
-#             config:
-#                 - subnet: 192.168.99.0/24
