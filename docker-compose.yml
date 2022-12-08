@@ -8,8 +8,8 @@ services:
         volumes:
             - ./Media:/app/media/
             - ./Cache:/app/cache/
-        env_file:
-            - "api.env"
+        # env_file:
+        #     - "api.env"
         ports:
             - "10100:8000"
         networks:
