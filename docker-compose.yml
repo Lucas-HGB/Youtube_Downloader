@@ -12,8 +12,8 @@ services:
         #     - "api.env"
         ports:
             - "10100:8000"
-        networks:
-            - privatenetwork
+        # networks:
+        #     - privatenetwork
         volumes:
             - /mnt/Tank/Media/Musics/:/app/media/mp3
             - /mnt/Pegaus/var/Youtube Downloader Cache:/app/cache/
@@ -24,14 +24,14 @@ services:
             context: "./FrontEnd/"
         ports:
             - "10105:80"
-        networks:
-            - privatenetwork
+        # networks:
+        #     - privatenetwork
 
-networks:
-    privatenetwork:
-        name: privatenetwork
-        driver: bridge
-        ipam:
-            driver: default
-            config:
-                - subnet: 192.168.99.0/24
+# networks:
+#     privatenetwork:
+#         name: privatenetwork
+#         driver: bridge
+#         ipam:
+#             driver: default
+#             config:
+#                 - subnet: 192.168.99.0/24
