@@ -19,6 +19,9 @@ class MetadataHandler:
 		logger.info(f'add_cover')
 		audio_file = MP3(self.file_name)
 		audio_file.tags.add(id3.APIC(mime='image/jpeg', type=3, desc=u'Cover', data=bytes(base64.b64decode(thumbnail))))
+		audio_file.save()
+
+		self.audio_file = easyid3.EasyID3(self.file_name)
 
 	def __setitem__(self, key, value):
 		logger.debug(f'setitem on {key!r} with value {value!r}')

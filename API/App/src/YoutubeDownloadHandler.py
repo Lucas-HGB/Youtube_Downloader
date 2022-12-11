@@ -49,6 +49,9 @@ class YoutubeHandler:
         video_clip.audio.write_audiofile(output_path)
 
         with MetadataHandler(output_path) as mp3:
+            mp3.add_cover(self.metadata.thumbnail_b64)
+
+        with MetadataHandler(output_path) as mp3:
             mp3['title'] = Filter.filter_title(self.metadata.title)
             mp3['artist'] = Filter.filter_artist(self.metadata.channel)
             if hasattr(self.metadata, 'album') and self.metadata.album is not None:
@@ -56,7 +59,6 @@ class YoutubeHandler:
             mp3['website'] = self.url
             if self.metadata.other.get('language'):
                 mp3['language'] = self.metadata.other.get('language', '')
-            mp3.add_cover(self.metadata.thumbnail_b64)
 
         self.move_file(output_path, os.path.join(self.configs.mp3_output_path, file))
 
