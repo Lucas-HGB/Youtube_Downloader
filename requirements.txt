@@ -1,3 +1,0 @@
-wget
-yt_dlp
-mutagen

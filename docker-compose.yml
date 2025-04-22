@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  api:
+    image: youtube_downloader:api
+    build: ./backend
+    ports:
+      - "5000:8000"
+    volumes:
+      - ./downloads:/app/downloads
+    environment:
+      - PYTHONUNBUFFERED=1
+      - YOUTUBE_API_KEY=AIzaSyDGONeLAzHnEisLXBbAfk7-ZaV6xgtWlEQ
+
+  front:
+    image: youtube_downloader:front
+    build: ./frontend
+    volumes:
+      - ./downloads:/app/downloads
+    ports:
+      - "3000:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
